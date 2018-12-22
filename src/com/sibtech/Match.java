@@ -2,15 +2,13 @@ package com.sibtech;
 
 public class Match {
 
-    int homeScore,awayScore;
+    int homeScore = 0,awayScore = 0;
     String homeTeamName, awayTeamName;
     String[] teamNames;
+    String result;
+    String homeResult, awayResult;
 
     public Match() {
-        //initialise scores at start of match
-        homeScore = 0;
-        awayScore = 0;
-
         //Get home and away team names
         teamNames = GetTeamNames();
         homeTeamName = teamNames[0];
@@ -35,14 +33,15 @@ public class Match {
     }
 
     public void MatchEvent (int min, Team homeTeam, Team awayTeam) {
-        String event = "Goal";
+        String timestamp = (min + "' - ");
+        String event;
         Team eventTeam;
-        //double eventRoll = Math.random() * 100;
+        double eventRoll = Math.random() * 100;
         double teamRoll = Math.round(Math.random());
 
-        ////determine the type of event - fix later
-        //if (eventRoll > 20) {event = "Goal";}
-        //else if (eventRoll <= 20) {event = "Card";}
+        //determine the type of event - fix later
+        if (eventRoll > 20) {event = "Goal";}
+        else {event = "Card";}
 
         //determine which team the event happens to
         if (teamRoll == 0) {
@@ -51,13 +50,38 @@ public class Match {
             eventTeam = awayTeam;
         }
 
+        //make the event happen
         switch (event) {
             case "Goal":
-                eventTeam.scoreGoal();
-                System.out.println(min + "' - " + "GOAL! - " + homeTeam.teamName + " " + homeTeam.goals + " - " + awayTeam.goals + " " + awayTeam.teamName);
+                if (eventTeam.equals(homeTeam)) {
+                    homeScore++;
+                } else {
+                    awayScore++;
+                }
+                System.out.println(timestamp + "GOAL! - " + homeTeam.teamName + " " + homeScore + " - " + awayScore + " " + awayTeam.teamName);
                 break;
             case "Card":
+                eventTeam.getYellowCard();
+                System.out.println(timestamp + "Yellow card for " + eventTeam.teamName);
                 break;
         }
+    }
+
+    public String MatchResult() {
+        int scoreDiff = homeScore - awayScore;
+        if (scoreDiff > 0) {
+            result = "Home Win";
+            homeResult = "win";
+            awayResult = "loss";
+        } else if (scoreDiff < 0) {
+            result = "Away Win";
+            homeResult = "loss";
+            awayResult = "win";
+        } else {
+            result = "Draw";
+            homeResult = "draw";
+            awayResult = "draw";
+        }
+        return result;
     }
 }

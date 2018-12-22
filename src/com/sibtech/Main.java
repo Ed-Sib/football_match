@@ -1,7 +1,13 @@
 package com.sibtech;
 
+/*TODO
+    - Loop the match logic to be able to play multiple matches and simulate a league
+    - Add more match events (red cards, penalties)
+    - Add players to the teams
+    - Sort out Goal-as-separate-object logic
+ */
+
 public class Main {
-    //TODO - make a league to record the result of multiple matches
 
     public static void main(String[] args) {
         //Start new match
@@ -22,5 +28,21 @@ public class Main {
                 System.out.println("FULL TIME");
             }
         }
+
+        //Determine the final result
+        if (match.MatchResult().equals("Home Win")) {
+            System.out.println("Result: " + homeTeam.teamName + " Win!");
+        } else if (match.MatchResult().equals("Away Win")) {
+            System.out.println("Result: " + awayTeam.teamName + " Win!");
+        } else {
+            System.out.println("Result: Draw!");
+        }
+        //Enters the result to the team object
+        homeTeam.EnterResult(match.homeResult, match.homeScore, match.awayScore);
+        awayTeam.EnterResult(match.awayResult, match.awayScore, match.homeScore);
+
+        //Print new stats
+        System.out.println(homeTeam.teamName + " standings: " + homeTeam.GetTeamStats());
+        System.out.println(awayTeam.teamName + " standings: " + awayTeam.GetTeamStats());
     }
 }
