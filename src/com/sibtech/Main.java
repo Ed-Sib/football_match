@@ -2,8 +2,11 @@ package com.sibtech;
 
 /*TODO
     - Loop the match logic to be able to play multiple matches and simulate a league
-    - Add more match events (red cards, penalties)
-    - Add players to the teams
+    - Add more match events (red cards, penalties, throw-ins, corners, good save)
+        -add match stats (saves, tackles etc.)
+    - Add functionality to players
+        -make all relevant events happen to a specific player
+        -track events which happen to players so logic makes sense (no events after red cards etc.)
     - Sort out Goal-as-separate-object logic
  */
 
@@ -17,11 +20,9 @@ public class Main {
         Team homeTeam = new Team(match.homeTeamName);
         Team awayTeam = new Team(match.awayTeamName);
 
-        //roll every minute for chance of an event happening
+        //chance for each event once per minute
         for (int min=0;min<=90;min++) {
-            if (Math.random() < 0.1) {
-                match.MatchEvent(min, homeTeam, awayTeam);
-            }
+            match.MatchEvent(min, homeTeam, awayTeam);
             if (min == 45) {
                 System.out.println("HALF TIME");
             } else if (min == 90) {
@@ -29,14 +30,8 @@ public class Main {
             }
         }
 
-        //Determine the final result
-        if (match.MatchResult().equals("Home Win")) {
-            System.out.println("Result: " + homeTeam.teamName + " Win!");
-        } else if (match.MatchResult().equals("Away Win")) {
-            System.out.println("Result: " + awayTeam.teamName + " Win!");
-        } else {
-            System.out.println("Result: Draw!");
-        }
+        match.MatchResult();
+
         //Enters the result to the team object
         homeTeam.EnterResult(match.homeResult, match.homeScore, match.awayScore);
         awayTeam.EnterResult(match.awayResult, match.awayScore, match.homeScore);
