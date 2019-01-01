@@ -6,33 +6,48 @@ import java.util.Random;
 public class Match {
 
     int homeScore = 0,awayScore = 0;
-    String homeTeamName, awayTeamName;
+    Team homeTeam, awayTeam;
     String matchResult;
     String homeResult, awayResult;
     Random random = new Random();
 
     //weighting values for random event, % chance each minute
     private HashMap<String, Double> eventWeights = new HashMap<String, Double>() {{
-        put("goal", 9.0);                                  //% chance of a goal occurring
-        put("card", 3.0);                                  //% chance of card being awarded
-        put("redCardChance", 25.0);                        //% chance of awarded card being red
-        put("freeKick", 4.0);                              //% chance of free kick being awarded
-        put("penalty", 2.0);                               //% chance of penalty being awarded
+        put("goal", 7.0);                                  //% chance of a goal occurring
+        put("card", 4.0);                                  //% chance of card being awarded
+        put("redCardChance", 10.0);                        //% chance of awarded card being red
+        put("freeKick", 5.0);                              //% chance of free kick being awarded
+        put("penalty", 1.5);                               //% chance of penalty being awarded
         put("penaltyScoreChance", 80.0);                   //% chance of penalty being scored
     }};
 
-    public Match() {
-        //create variables and list of possible names
-        String[] teams = {"Pegasus United", "Toton Tigers", "Stapleford Swans", "Long Eaton Lazybones", "Beeston Bulldogs"};
-
-        //gets random team names from the list
-        homeTeamName = teams[random.nextInt(4)];
-        awayTeamName = teams[random.nextInt(4)];
-        //if the same team is picked twice, re-roll the away team until it is different
-        while (awayTeamName.equals(homeTeamName)) {
-            awayTeamName = teams[random.nextInt(4)];
+    //Constructor resets stats (cards etc.), kicks off the match and records the result
+    public Match(Team matchHomeTeam, Team matchAwayTeam) {
+        homeTeam = matchHomeTeam;
+        awayTeam = matchAwayTeam;
+        for (Player p : matchHomeTeam.teamPlayers) {
+            p.PlayerReset();
         }
-        System.out.println("Match: " + homeTeamName + " vs " + awayTeamName);
+        for (Player p : matchAwayTeam.teamPlayers) {
+            p.PlayerReset();
+        }
+        MatchEventTrigger(homeTeam, awayTeam);
+        MatchResult();
+    }
+
+    public void MatchEventTrigger (Team homeTeam, Team awayTeam) {
+        //chance for each event once per minute
+        for (int min=1;min<=90;min++) {
+            if (min == 0) {
+                System.out.println("KICK OFF");
+            }
+            MatchEvent(min, homeTeam, awayTeam);
+            if (min == 45) {
+                System.out.println("HALF TIME");
+            } else if (min == 90) {
+                System.out.println("FULL TIME");
+            }
+        }
     }
 
     public void MatchEvent (int min, Team homeTeam, Team awayTeam) {
@@ -53,17 +68,15 @@ public class Match {
             } else {
                 awayScore++;
             }
-            Player goalScorer = eventTeam.GetScorer();
-            System.out.println(timestamp + "GOAL! (" + goalScorer.playerName + ") - " + homeTeam.teamName + " " + homeScore + " - " + awayScore + " " + awayTeam.teamName);
+            eventTeam.TeamGoal(timestamp);
+            System.out.println(" - " + homeTeam.teamName + " " + homeScore + " - " + awayScore + " " + awayTeam.teamName);
         }
         //cards
         if ((Math.random() * 100) < eventWeights.get("card")) {
             if (Math.random() > 0.25) {
-                eventTeam.getYellowCard();
-                System.out.println(timestamp + "Yellow card for " + eventTeam.teamName);
+                eventTeam.GetYellowCard(timestamp);
             } else {
-                eventTeam.getRedCard();
-                System.out.println(timestamp + "Red card for " + eventTeam.teamName);
+                eventTeam.GetRedCard(timestamp);
             }
         }
         //throw-in
@@ -78,8 +91,8 @@ public class Match {
                 } else {
                     awayScore++;
                 }
-                Player goalScorer = eventTeam.GetScorer();
-                System.out.println(timestamp + "GOAL! (pen)(" + goalScorer.playerName + ") - " + homeTeam.teamName + " " + homeScore + " - " + awayScore + " " + awayTeam.teamName);
+                eventTeam.TeamGoal(timestamp);
+                System.out.println(" - " + homeTeam.teamName + " " + homeScore + " - " + awayScore + " " + awayTeam.teamName);
             } else {
                 System.out.println(timestamp + "Missed Penalty for " + eventTeam.teamName + "!");
             }
@@ -103,11 +116,14 @@ public class Match {
         }
 
         if (matchResult.equals("Home Win")) {
-            System.out.println("Result: " + homeTeamName + " Win " + homeScore + "-" + awayScore);
+            System.out.println("Result: " + homeTeam.teamName + " Win " + homeScore + "-" + awayScore);
         } else if (matchResult.equals("Away Win")) {
-            System.out.println("Result: " + awayTeamName + " Win " + awayScore + "-" + homeScore);
+            System.out.println("Result: " + awayTeam.teamName + " Win " + awayScore + "-" + homeScore);
         } else {
             System.out.println("Result: " + homeScore + "-" + awayScore + " Draw");
         }
+        //Enters the result to the team object
+        homeTeam.EnterResult(homeResult, homeScore, awayScore);
+        awayTeam.EnterResult(awayResult, awayScore, homeScore);
     }
 }

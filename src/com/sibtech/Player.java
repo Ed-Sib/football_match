@@ -1,21 +1,46 @@
 package com.sibtech;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Player {
     String playerName, playerTeam;
     int goalsScored = 0;
     Random random = new Random();
+    //TODO add tracking of cards, fouls etc.
+    Boolean yellowCard = false;
+    int yellowCardCount = 0;
+    Boolean redCard = false;
+    int redCardCount = 0;
 
     public Player (String teamName) {
         playerName = GeneratePlayerName();
         playerTeam = teamName;
+        yellowCard = false;
+        redCard = false;
+    }
+
+    public void PlayerReset() {
+        yellowCard = false;
+        redCard = false;
     }
 
     public int PlayerGoal () {
         goalsScored++;
         return goalsScored;
+    }
+
+    public void PlayerYellowCard() {
+        yellowCardCount++;
+        if (yellowCard) {
+            PlayerRedCard();
+        } else {
+            yellowCard = true;
+        }
+    }
+
+    public void PlayerRedCard() {
+        redCardCount++;
+        redCard = true;
     }
 
     private String GeneratePlayerName() {
@@ -74,8 +99,8 @@ public class Player {
                 ,"TODD","CHARLES","PAUL","CRAWFORD","O'CONNOR","PARK","FORREST","LOVE","ROWLAND","CONNOLLY","SHEPPARD"
                 ,"HARDING","BANKS","ROWE","HUMPHREYS"};
         String firstName = firstNames[random.nextInt(300)];
-        String lastname = lastNames[random.nextInt(300)];
-        String fullName = firstName + " " + lastname;
+        String lastName = lastNames[random.nextInt(300)];
+        String fullName = firstName + " " + lastName;
         return fullName;
     }
 }

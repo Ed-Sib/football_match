@@ -1,43 +1,49 @@
 package com.sibtech;
 
 /*TODO
-    - Loop the match logic to be able to play multiple matches and simulate a league
     - Add more match events (red cards, penalties, throw-ins, corners, good save)
         -add match stats (saves, tackles etc.)
+        -add random number of injury time minutes;
     - Add functionality to players
         -make all relevant events happen to a specific player
         -track events which happen to players so logic makes sense (no events after red cards etc.)
+        -do "end of season awards"
+        -work out MVP - fantasy league points scoring?
     - Sort out Goal-as-separate-object logic
  */
 
 public class Main {
 
     public static void main(String[] args) {
+        //set how many matches to be played
+        //int numberOfMatches = 5;
+        int matchID = 1; //starting value
+
         //Start new match
-        Match match = new Match();
+        League league1 = new League();
 
-        //creates the teams as objects
-        Team homeTeam = new Team(match.homeTeamName);
-        Team awayTeam = new Team(match.awayTeamName);
-
-        //chance for each event once per minute
-        for (int min=0;min<=90;min++) {
-            match.MatchEvent(min, homeTeam, awayTeam);
-            if (min == 45) {
-                System.out.println("HALF TIME");
-            } else if (min == 90) {
-                System.out.println("FULL TIME");
+        //loop which causes each team to play each other twice
+        for (int i=0; i<league1.teams.length; i++) {
+            for (int j=0; j<league1.teams.length; j++) {
+                if (i != j) { //stops the team playing itself
+                    league1.PlayMatch(matchID, league1.teams[i], league1.teams[j]);
+                    matchID++;
+                }
             }
         }
 
-        match.MatchResult();
+        //for (int i=0; i < numberOfMatches; i++){
+        //    league1.PlayMatch(i+1);
+        //}
 
-        //Enters the result to the team object
-        homeTeam.EnterResult(match.homeResult, match.homeScore, match.awayScore);
-        awayTeam.EnterResult(match.awayResult, match.awayScore, match.homeScore);
+        //Print out the league table
+        System.out.println("-----------------------------------------");
+        System.out.println("League Table:");
+        for (Team team : league1.GetLeagueResults()) {
+            System.out.println(team.GetTeamStats());
+        }
 
-        //Print new stats
-        System.out.println(homeTeam.teamName + " standings: " + homeTeam.GetTeamStats());
-        System.out.println(awayTeam.teamName + " standings: " + awayTeam.GetTeamStats());
+        //work out end-of-season awards
+        league1.PlayerAwards();
     }
 }
